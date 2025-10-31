@@ -24,6 +24,7 @@ function App() {
   const [data, setData] = useState<Artwork[]>([]);
   const [page, setPage] = useState<number>(1);
   const [rows, setRows] = useState<number>(5);
+  const [first, setFirst] = useState<number>(0);
   const [isLoading, setLoading] = useState(false);
   const [selectedArtworks, setSelectedArtworks] = useState<Artwork[]>([]);
   const [rowCount, setRowCount] = useState<string>("");
@@ -100,13 +101,15 @@ function App() {
         <DataTable
           value={data}
           paginator
-          rows={rows}
           lazy
-          rowsPerPageOptions={[5, 10, 15, 20]}
+          first={first}
+          rows={rows}
           totalRecords={100}
+          rowsPerPageOptions={[5, 10, 15, 20]}
           onPage={(e: DataTablePageEvent) => {
-            setPage(e.page ?? 0 + 1);
+            setFirst(e.first);
             setRows(e.rows);
+            setPage((e.page ?? 0) + 1);
           }}
           responsiveLayout="scroll"
           emptyMessage="No artworks found."
