@@ -8,7 +8,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { OverlayPanel } from "primereact/overlaypanel";
-import type { PaginatorPageChangeEvent } from "primereact/paginator";
+import type { DataTablePageEvent } from "primereact/datatable";
 
 interface Artwork {
   id: number;
@@ -23,7 +23,7 @@ interface Artwork {
 function App() {
   const [data, setData] = useState<Artwork[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [row, setRows] = useState(5);
+  const [rows, setRows] = useState<number>(5);
   const [isLoading, setLoading] = useState(false);
   const [selectedArtworks, setSelectedArtworks] = useState<Artwork[]>([]);
   const [rowCount, setRowCount] = useState<string>("");
@@ -34,7 +34,7 @@ function App() {
       try {
         setLoading(true);
         const res = await fetch(
-          `https://api.artic.edu/api/v1/artworks?page=${page}&limit=${row} `
+          `https://api.artic.edu/api/v1/artworks?page=${page}&limit=${rows}`
         );
         const result = await res.json();
         setData(result.data || []);
@@ -45,14 +45,13 @@ function App() {
       }
     };
     fetchData();
-  }, [page, row]);
+  }, [page, rows]);
 
   const handleSubmit = (e: MouseEvent<HTMLElement>) => {
     const count = parseInt(rowCount);
     if (!isNaN(count) && count > 0) {
       setSelectedArtworks(data.slice(0, count));
     }
-
     ref.current?.toggle(e);
   };
 
@@ -65,7 +64,6 @@ function App() {
         <span>⌄</span>
         <span>Title</span>
       </div>
-
       <OverlayPanel ref={ref} className="flex flex-col !gap-1 !mt-1">
         <input
           type="number"
@@ -102,13 +100,12 @@ function App() {
         <DataTable
           value={data}
           paginator
-          rows={row}
+          rows={rows}
           lazy
           rowsPerPageOptions={[5, 10, 15, 20]}
-          // first={(page - 1) * 10}
-          totalRecords={50}
-          onPage={(e: PaginatorPageChangeEvent) => {
-            setPage(e.page + 1);
+          totalRecords={100}
+          onPage={(e: DataTablePageEvent) => {
+            setPage(e.page ?? 0 + 1);
             setRows(e.rows);
           }}
           responsiveLayout="scroll"
